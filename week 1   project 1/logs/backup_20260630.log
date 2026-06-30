@@ -1,0 +1,5 @@
+[2026-06-30 12:00:43] [INFO] Starting backup of '/c/Users/Tahir Manzoor/Documents' -> '/c/Users/Tahir Manzoor/backups/backup_Documents_20260630_120043.tar.gz'
+[2026-06-30 12:00:45] [INFO] Backup completed successfully. Size: 12K
+[2026-06-30 12:00:45] [INFO] Removing backups older than 7 days from '/c/Users/Tahir Manzoor/backups'
+[2026-06-30 12:00:45] [INFO] Rotated logs older than 14 days.
+[2026-06-30 12:00:45] [INFO] Backup job finished.

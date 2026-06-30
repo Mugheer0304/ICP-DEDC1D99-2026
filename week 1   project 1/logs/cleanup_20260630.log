@@ -1,0 +1,22 @@
+[2026-06-30 12:03:14] [INFO] Starting cleanup of '/tmp' (files older than 10 days)
+[2026-06-30 12:03:15] [INFO] [DRY RUN] Would delete: /tmp/BIT359B.tmp
+[2026-06-30 12:03:15] [INFO] [DRY RUN] Would remove empty directory: /tmp/vscode-stable-user-x64
+[2026-06-30 12:03:15] [INFO] [DRY RUN] Would remove empty directory: /tmp/WinGet
+[2026-06-30 12:03:16] [INFO] [DRY RUN] Would remove empty directory: /tmp/WSLDVCPlugin/docker-desktop
+[2026-06-30 12:03:16] [INFO] [DRY RUN] Would remove empty directory: /tmp/{10AFCD1D-8512-4B6B-AA5C-079D43FCE5C7}
+[2026-06-30 12:03:16] [INFO] [DRY RUN] Would remove empty directory: /tmp/{187E376E-1635-4790-82FC-5148EF6A3077}
+[2026-06-30 12:03:16] [INFO] [DRY RUN] Would remove empty directory: /tmp/{2C041D04-1029-4501-B595-6D5F35B98716}
+[2026-06-30 12:03:16] [INFO] [DRY RUN] Would remove empty directory: /tmp/{3D1045DC-A518-4C02-BC6A-6990DEC2DA39}
+[2026-06-30 12:03:16] [INFO] [DRY RUN] Would remove empty directory: /tmp/{5662E1FA-B887-4F4C-BAAB-5E6C60D03B86}
+[2026-06-30 12:03:16] [INFO] [DRY RUN] Would remove empty directory: /tmp/{5ED48B8F-1AFB-4406-A6E0-CCF5DE374FB5}
+[2026-06-30 12:03:16] [INFO] [DRY RUN] Would remove empty directory: /tmp/{6437ADB1-4C99-471F-81F9-6203CDAEFC20}
+[2026-06-30 12:03:16] [INFO] [DRY RUN] Would remove empty directory: /tmp/{98236FE6-BBE4-4697-A404-3DBB1D7AB495}
+[2026-06-30 12:03:16] [INFO] [DRY RUN] Would remove empty directory: /tmp/{99AD067D-C7C8-4409-855F-A15DF143D574}
+[2026-06-30 12:03:17] [INFO] [DRY RUN] Would remove empty directory: /tmp/{9D810803-F6C4-4EEC-858C-AEA9F9430F14}
+[2026-06-30 12:03:17] [INFO] [DRY RUN] Would remove empty directory: /tmp/{A1A37D1E-8633-46DB-AF44-FB3111FE1797}
+[2026-06-30 12:03:17] [INFO] [DRY RUN] Would remove empty directory: /tmp/{A3EFE66A-D685-439E-B69D-1B284B63DA54}
+[2026-06-30 12:03:17] [INFO] [DRY RUN] Would remove empty directory: /tmp/{A673EF3C-A8BE-4C1F-83B6-922265FBCC73}
+[2026-06-30 12:03:17] [INFO] [DRY RUN] Would remove empty directory: /tmp/{CFC66938-BDAC-4AEA-82A2-55C27FC6B6B2}
+[2026-06-30 12:03:17] [INFO] [DRY RUN] Would remove empty directory: /tmp/{D0F5DB13-B867-44AA-927B-2F0D2D3C345C}
+[2026-06-30 12:03:17] [INFO] [DRY RUN] Would remove empty directory: /tmp/{EE47B06A-264C-4D23-980D-FDB6C4E54F5A}
+[2026-06-30 12:03:17] [INFO] Cleanup job finished.
