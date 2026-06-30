@@ -9,7 +9,9 @@
 # Example:
 #   ./backup.sh /home/user/project /home/user/backups 7
 # ==========================================================
+ 
 
+ 
 source "$(dirname "$0")/lib_common.sh"
 
 # ---------- Input validation ----------
