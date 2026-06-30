@@ -5,7 +5,10 @@
 #   source "$(dirname "$0")/lib_common.sh"
 # ==========================================================
 
+
 # Directory where all log files are stored
+
+
 LOG_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/logs"
 mkdir -p "$LOG_DIR"
 
