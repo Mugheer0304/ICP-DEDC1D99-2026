@@ -1,0 +1,15 @@
+{
+  "name": "todo-backend",
+  "version": "1.0.0",
+  "description": "Simple Todo API backend for Docker demo project",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "pg": "^8.11.5",
+    "cors": "^2.8.5"
+  }
+}
