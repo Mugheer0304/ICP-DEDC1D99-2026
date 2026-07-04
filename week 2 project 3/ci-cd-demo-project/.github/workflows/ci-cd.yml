@@ -12,7 +12,8 @@ on:
 
 env:
   NODE_VERSION: '20'
-  APP_DIR: app
+  APP_DIR: 'week 2 project 3/ci-cd-demo-project/app'
+  PROJECT_ROOT: 'week 2 project 3/ci-cd-demo-project'
 
 jobs:
 
