@@ -106,8 +106,8 @@ jobs:
         run: npm run build
 
       - name: Package build artifact
-        run: tar -czf app-build.tar.gz app Dockerfile
-
+        run: tar -czf app-build.tar.gz "${{ env.PROJECT_ROOT }}/app" "${{ env.PROJECT_ROOT }}/Dockerfile"
+        
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
