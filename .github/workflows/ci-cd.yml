@@ -1,0 +1,185 @@
+name: CI/CD Pipeline
+
+# ---------------------------------------------------------------------------
+# WHEN THIS PIPELINE RUNS
+# ---------------------------------------------------------------------------
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'week 2 project 3/ci-cd-demo-project/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'week 2 project 3/ci-cd-demo-project/**'
+  workflow_dispatch: {}
+
+env:
+  NODE_VERSION: '20'
+  APP_DIR: 'week 2 project 3/ci-cd-demo-project/app'
+  PROJECT_ROOT: 'week 2 project 3/ci-cd-demo-project'
+
+jobs:
+
+  # =========================================================================
+  # STAGE 1: LINT — catches style/syntax problems before anything else runs
+  # =========================================================================
+  lint:
+    name: 1) Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ env.APP_DIR }}/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ${{ env.APP_DIR }}
+        run: npm ci
+
+      - name: Run ESLint
+        working-directory: ${{ env.APP_DIR }}
+        run: npm run lint
+
+  # =========================================================================
+  # STAGE 2: TEST — unit + integration tests, only runs if lint passed
+  # =========================================================================
+  test:
+    name: 2) Test
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ env.APP_DIR }}/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ${{ env.APP_DIR }}
+        run: npm ci
+
+      - name: Run tests with coverage
+        working-directory: ${{ env.APP_DIR }}
+        run: npm test
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: ${{ env.APP_DIR }}/coverage
+          retention-days: 7
+
+  # =========================================================================
+  # STAGE 3: BUILD — verifies the app builds/boots and packages an artifact
+  # =========================================================================
+  build:
+    name: 3) Build
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ env.APP_DIR }}/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ${{ env.APP_DIR }}
+        run: npm ci --omit=dev
+
+      - name: Run build check
+        working-directory: ${{ env.APP_DIR }}
+        run: npm run build
+
+      - name: Package build artifact
+        run: tar -czf app-build.tar.gz app Dockerfile
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-build
+          path: app-build.tar.gz
+          retention-days: 7
+
+  # =========================================================================
+  # STAGE 4: DOCKER BUILD & PUSH — only on main, only after build succeeds
+  # =========================================================================
+  docker-publish:
+    name: 4) Build & Push Docker Image
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/ci-cd-demo-app:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/ci-cd-demo-app:${{ github.sha }}
+
+  # =========================================================================
+  # STAGE 5: DEPLOY — final stage, only runs on main after the image is pushed
+  # =========================================================================
+  deploy:
+    name: 5) Deploy
+    runs-on: ubuntu-latest
+    needs: docker-publish
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: production
+      url: ${{ steps.deploy-step.outputs.deployed_url }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # --- Example: deploy via SSH to your own server that runs Docker ---
+      # Uncomment and configure this block if you deploy to your own VM.
+      #
+      # - name: Deploy to server over SSH
+      #   uses: appleboy/ssh-action@v1.0.3
+      #   with:
+      #     host: ${{ secrets.DEPLOY_HOST }}
+      #     username: ${{ secrets.DEPLOY_USER }}
+      #     key: ${{ secrets.DEPLOY_SSH_KEY }}
+      #     script: |
+      #       docker pull ${{ secrets.DOCKERHUB_USERNAME }}/ci-cd-demo-app:latest
+      #       docker stop ci-cd-demo-app || true
+      #       docker rm ci-cd-demo-app || true
+      #       docker run -d --name ci-cd-demo-app -p 3000:3000 ${{ secrets.DOCKERHUB_USERNAME }}/ci-cd-demo-app:latest
+
+      # --- Example: deploy to Render via a deploy hook (simpler alternative) ---
+      # - name: Trigger Render deploy hook
+      #   run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+
+      - name: Simulated deployment step (replace with real deploy above)
+        id: deploy-step
+        run: |
+          echo "Deploying image ${{ secrets.DOCKERHUB_USERNAME }}/ci-cd-demo-app:${{ github.sha }}"
+          echo "deployed_url=https://example.com" >> "$GITHUB_OUTPUT"
+          echo "✅ Deployment step complete."
