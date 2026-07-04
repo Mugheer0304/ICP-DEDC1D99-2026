@@ -1,0 +1,22 @@
+{
+  "name": "ci-cd-demo-app",
+  "version": "1.0.0",
+  "description": "A tiny Express app used to demonstrate a complete CI/CD pipeline",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest --coverage",
+    "lint": "eslint . --ext .js",
+    "build": "echo 'No compile step needed for plain Node.js - build stage validates the app boots correctly' && node -e \"require('./index.js'); console.log('Build check passed: app module loads correctly')\""
+  },
+  "keywords": ["cicd", "demo", "github-actions"],
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.4"
+  }
+}
