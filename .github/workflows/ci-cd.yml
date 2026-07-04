@@ -107,7 +107,7 @@ jobs:
 
       - name: Package build artifact
         run: tar -czf app-build.tar.gz "${{ env.PROJECT_ROOT }}/app" "${{ env.PROJECT_ROOT }}/Dockerfile"
-        
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
@@ -136,8 +136,8 @@ jobs:
       - name: Build and push image
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: ./Dockerfile
+          context: ${{ env.PROJECT_ROOT }}
+          file: ${{ env.PROJECT_ROOT }}/Dockerfile
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/ci-cd-demo-app:latest
