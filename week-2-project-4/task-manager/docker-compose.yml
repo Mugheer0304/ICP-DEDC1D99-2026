@@ -1,0 +1,119 @@
+# ==================================================================
+# TASK MANAGER — MICROSERVICES DEMO
+# Services: postgres (db), redis (cache), backend (API), frontend (UI)
+# ==================================================================
+
+services:
+
+  # ---------------- DATABASE ----------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: task_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      # Runs once on first startup to create table + seed data
+      - ./backend/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - backend-net
+
+  # ---------------- CACHE ----------------
+  redis:
+    image: redis:7-alpine
+    container_name: task_redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - backend-net
+
+  # ---------------- BACKEND API ----------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: task_backend
+    restart: unless-stopped
+    environment:
+      PORT: 5000
+      NODE_ENV: ${NODE_ENV}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - "${BACKEND_PORT}:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy   # wait until Postgres is actually ready
+      redis:
+        condition: service_healthy   # wait until Redis is actually ready
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - backend-net
+      - frontend-net
+
+  # ---------------- FRONTEND ----------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: task_frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT}:80"
+    depends_on:
+      backend:
+        condition: service_healthy   # wait until backend API is actually ready
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:82"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - frontend-net
+
+# ==================================================================
+# NETWORKS — isolate the database/cache from the public-facing side.
+# Only "backend" sits on both networks, acting as the boundary.
+# "frontend" cannot talk to postgres/redis directly.
+# ==================================================================
+networks:
+  backend-net:
+    driver: bridge
+  frontend-net:
+    driver: bridge
+
+# ==================================================================
+# VOLUMES — persist database data across container restarts/rebuilds
+# ==================================================================
+volumes:
+  pg_data:
+    driver: local
